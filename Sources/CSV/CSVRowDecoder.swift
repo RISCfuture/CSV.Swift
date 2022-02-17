@@ -24,7 +24,7 @@ internal class CSVRowDecoder: Decoder {
     }
     
     func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-        fatalError("unkeyedContainer() has not yet been implemented")
+        CSVRowUnkeyedDecoder(decoder: self)
     }
     
     func singleValueContainer() throws -> SingleValueDecodingContainer {
@@ -200,14 +200,14 @@ internal class CSVSingleValueDecodingContainer: SingleValueDecodingContainer {
     }
     
     func decodeNil() -> Bool {
-        fatalError("decodeNil() has not yet been implemented")
+        data.trimmingCharacters(in: CharacterSet.whitespaces).isEmpty
     }
     
     func decode(_ type: Bool.Type) throws -> Bool {
         switch data.uppercased() {
-            case "TRUE", "YES", "1": return true
-            case "FALSE", "NO", "0": return false
-            default: throw DecodingError.typeMismatch(Bool.self, .init(codingPath: [], debugDescription: "Expected to decode Bool but found a string/data instead.", underlyingError: nil))
+        case "TRUE", "YES", "1": return true
+        case "FALSE", "NO", "0": return false
+        default: throw DecodingError.typeMismatch(Bool.self, .init(codingPath: [], debugDescription: "Expected to decode Bool but found a string/data instead.", underlyingError: nil))
         }
     }
     
@@ -321,3 +321,280 @@ internal class CSVSingleValueDecodingContainer: SingleValueDecodingContainer {
         CSVSingleValueDecoder(data: data, codingPath: codingPath)
     }
 }
+
+internal class CSVRowUnkeyedDecoder: UnkeyedDecodingContainer {
+    let codingPath: [CodingKey] = []
+    let decoder: CSVRowDecoder
+    
+    var count: Int? { decoder.data.count }
+    
+    var isAtEnd: Bool { currentIndex >= decoder.data.count }
+    
+    var currentIndex = 0
+    
+    private var currentIndexCodingKey: CodingKey { IndexCodingKey(intValue: currentIndex)! }
+    private var codingPathAndIndex: Array<CodingKey> {
+        return codingPath + [currentIndexCodingKey]
+    }
+    
+    init(decoder: CSVRowDecoder) {
+        self.decoder = decoder
+    }
+    
+    struct IndexCodingKey: CodingKey {
+        let intValue: Int?
+        
+        var stringValue: String {
+            guard let intValue = intValue else { return "" }
+            return String(intValue)
+        }
+        
+        init?(stringValue: String) { self.intValue = Int(stringValue) }
+        init?(intValue: Int) { self.intValue = intValue }
+    }
+    
+    func decodeNil() throws -> Bool {
+        try checkAtEnd()
+        let value = CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decodeNil()
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: Bool.Type) throws -> Bool {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: String.Type) throws -> String {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: Double.Type) throws -> Double {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: Float.Type) throws -> Float {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: Int.Type) throws -> Int {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: Int8.Type) throws -> Int8 {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: Int16.Type) throws -> Int16 {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: Int32.Type) throws -> Int32 {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: Int64.Type) throws -> Int64 {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: UInt.Type) throws -> UInt {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: UInt8.Type) throws -> UInt8 {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: UInt16.Type) throws -> UInt16 {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: UInt32.Type) throws -> UInt32 {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode(_ type: UInt64.Type) throws -> UInt64 {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
+        try checkAtEnd()
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: Bool.Type) throws -> Bool? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: String.Type) throws -> String? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: Double.Type) throws -> Double? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: Float.Type) throws -> Float? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: Int.Type) throws -> Int? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: Int8.Type) throws -> Int8? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: Int16.Type) throws -> Int16? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: Int32.Type) throws -> Int32? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: Int64.Type) throws -> Int64? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: UInt.Type) throws -> UInt? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: UInt8.Type) throws -> UInt8? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: UInt16.Type) throws -> UInt16? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: UInt32.Type) throws -> UInt32? {
+        guard !isAtEnd else { return nil }
+        let value = UInt32(decoder.data[currentIndex])
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent(_ type: UInt64.Type) throws -> UInt64? {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    func decodeIfPresent<T>(_ type: T.Type) throws -> T? where T : Decodable {
+        guard !isAtEnd else { return nil }
+        let value = try CSVSingleValueDecodingContainer(data: decoder.data[currentIndex], codingPath: codingPathAndIndex).decode(type)
+        currentIndex += 1
+        return value
+    }
+    
+    
+    func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+        fatalError("nestedContainer() has not yet been implemented")
+    }
+    
+    func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
+        fatalError("nestedUnkeyedContainer() has not yet been implemented")
+    }
+    
+    func superDecoder() throws -> Decoder {
+        let value = CSVSingleValueDecoder(data: decoder.data[currentIndex], codingPath: codingPathAndIndex)
+        currentIndex += 1
+        return value
+    }
+    
+    private func checkAtEnd() throws {
+        guard !isAtEnd else {
+            let context = DecodingError.Context(codingPath: codingPathAndIndex, debugDescription: "Unkeyed container is at end", underlyingError: nil)
+            throw DecodingError.valueNotFound(Any?.self, context)
+        }
+    }
+    
+    private func typeMistmatchContext(value: String, type: String) -> DecodingError.Context {
+        return .init(codingPath: codingPathAndIndex, debugDescription: "Can't convert '\(value)' to type \(type)", underlyingError: nil)
+    }
+}
+
+
