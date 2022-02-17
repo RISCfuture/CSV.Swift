@@ -49,9 +49,13 @@ public class CSVParser {
         
         while let char = reader.pop()  {
             if char == delimiter {
-                if !fieldBuffer.isEmpty {
+                if fieldBuffer.isEmpty {
+                    rowBuffer.append("")
+                } else {
                     if let str = String(bytes: fieldBuffer, encoding: .utf8) {
                         rowBuffer.append(str)
+                    } else {
+                        rowBuffer.append("")
                     }
                     
                     fieldBuffer = []
